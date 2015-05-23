@@ -39,11 +39,9 @@ namespace WpfLab2
                 Height = 20,
                 Width = 30,
             };
-            if (!inHomeVersion)
-            {
-                ellipse.MouseEnter += ellipse_MouseEnter;
-                ellipse.MouseLeave += ellipse_MouseLeave;
-            }
+            ellipse.MouseEnter += ellipse_MouseEnter;
+            ellipse.MouseLeave += ellipse_MouseLeave;
+            ellipse.MouseUp += ellipse_MouseUp;
             Line line = new Line
             {
                 X1 = widthLocation - 5,
@@ -128,7 +126,41 @@ namespace WpfLab2
             if (!inHomeVersion)
                 widthLocation += 45;
         }
-        private void colorButtons(SolidColorBrush brush)
+
+        void ellipse_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            var el = (Ellipse)sender;
+            if (homeVersion)
+            {
+                var brush = new SolidColorBrush(Colors.Black);
+                colorElementsOnCanvas(brush);
+                brush = new SolidColorBrush(Colors.Orange);
+                el.Fill = brush;
+                foreach (UIElement sh in canvas.Children)
+                {
+                    if (sh is Line && ((Line)sh).Tag.ToString() == el.Tag.ToString())
+                    {
+                        ((Line)sh).Stroke = brush;
+                    }
+                    if (sh is Ellipse && ((Ellipse)sh).Tag.ToString() == el.Tag.ToString())
+                    {
+                        ((Ellipse)sh).Fill = brush;
+                    }
+                }
+                foreach (Button b in buttonList)
+                {
+                    if (b.Tag.ToString() == el.Tag.ToString())
+                    {
+                        b.Background = brush; // orange
+
+                    }
+                    else
+                        b.Background = new SolidColorBrush(Colors.White);
+                }
+
+            }
+        }
+        private void colorElementsOnCanvas(SolidColorBrush brush)
         {
             foreach (UIElement sh in canvas.Children)
             {
@@ -149,7 +181,7 @@ namespace WpfLab2
             if (homeVersion)
             {
                 but.Background = brush;
-                colorButtons(brush);
+                colorElementsOnCanvas(brush);
                 foreach (Button b in buttonList)
                     if (b != clickedButton)
                         b.Background = new SolidColorBrush(Colors.White);
@@ -174,19 +206,24 @@ namespace WpfLab2
         void ellipse_MouseLeave(object sender, MouseEventArgs e)
         {
             var el = (Ellipse)sender;
-            el.Fill = new SolidColorBrush(Colors.Black);
+            Color c = ((SolidColorBrush)el.Fill).Color;
+            if (c != Colors.Orange && c != Colors.SkyBlue)
+                el.Fill = new SolidColorBrush(Colors.Black);
         }
 
         void ellipse_MouseEnter(object sender, MouseEventArgs e)
         {
             var el = (Ellipse)sender;
-            el.Fill = new SolidColorBrush(Colors.Gray);
+            Color c = ((SolidColorBrush)el.Fill).Color;
+            if (c != Colors.Orange && c != Colors.SkyBlue)
+                el.Fill = new SolidColorBrush(Colors.Gray);
         }
 
         private void aMouseEnter(object sender, MouseEventArgs e)
         {
             var but = (Button)sender;
-            if (clickedButton != but)
+            Color c = ((SolidColorBrush)but.Background).Color;
+            if (clickedButton != but && c!=Colors.Orange)
                 but.Background = new SolidColorBrush(Colors.Gray);
             if (homeVersion)
                 drawNote(but, true);
@@ -195,7 +232,8 @@ namespace WpfLab2
         private void aMouseLeave(object sender, MouseEventArgs e)
         {
             var but = (Button)sender;
-            if (clickedButton != but || !homeVersion)
+            Color c = ((SolidColorBrush)but.Background).Color;
+            if ((clickedButton != but && c != Colors.Orange) || !homeVersion)
                 but.Background = new SolidColorBrush(Colors.White);
             if (homeVersion)
                 foreach (UIElement sh in hvShapes)
@@ -212,7 +250,7 @@ namespace WpfLab2
             homeVersion = false;
             foreach (Button b in buttonList)
                 b.Background = new SolidColorBrush(Colors.White);
-            colorButtons(new SolidColorBrush(Colors.Black));
+            colorElementsOnCanvas(new SolidColorBrush(Colors.Black));
         }
     }
 }
