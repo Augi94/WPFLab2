@@ -41,7 +41,7 @@ namespace WpfLab2
             };
             ellipse.MouseEnter += ellipse_MouseEnter;
             ellipse.MouseLeave += ellipse_MouseLeave;
-            ellipse.MouseUp += ellipse_MouseUp;
+            ellipse.MouseUp += shape_MouseUp;
             Line line = new Line
             {
                 X1 = widthLocation - 5,
@@ -52,6 +52,7 @@ namespace WpfLab2
                 Stroke = new SolidColorBrush(Colors.Black),
                 StrokeThickness = 3
             };
+            line.MouseUp += shape_MouseUp;
             Label label = new Label
             {
                 FontSize = 13,
@@ -127,15 +128,27 @@ namespace WpfLab2
                 widthLocation += 45;
         }
 
-        void ellipse_MouseUp(object sender, MouseButtonEventArgs e)
+        void shape_MouseUp(object sender, MouseButtonEventArgs e)
         {
-            var el = (Ellipse)sender;
+            Shape el=new Line();
+            if (sender is Ellipse)
+            {
+                el = (Ellipse)sender;
+            }
+            if(sender is Line)
+            { 
+                el = (Line)sender;
+            }
+
             if (homeVersion)
             {
                 var brush = new SolidColorBrush(Colors.Black);
                 colorElementsOnCanvas(brush);
                 brush = new SolidColorBrush(Colors.Orange);
-                el.Fill = brush;
+                if (el is Ellipse)
+                    el.Fill = brush;
+                else
+                    el.Stroke = brush;
                 foreach (UIElement sh in canvas.Children)
                 {
                     if (sh is Line && ((Line)sh).Tag.ToString() == el.Tag.ToString())
